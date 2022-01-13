@@ -15,6 +15,7 @@ router.post("/userpost", (req, res) => {
   console.log(username);
 });
 
+//update user profile
 router.put("/:id", verifyTokenAndAuthorized, async (req, res) => {
   //if user updatepassword decrypt password and assign that value to req.password
   if (req.body.password) {

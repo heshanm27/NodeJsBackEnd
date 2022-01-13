@@ -23,26 +23,30 @@ router.post("/register", (req, res) => {
     });
 });
 
+//user login
 router.post("/login", async (req, res) => {
   try {
+    //search if any user has email in database
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       res.status(401).json("User Does Not Exist");
       return;
     }
+
+    //decrypt found user password
     const hashPassword = CryptoJS.AES.decrypt(
       user.password,
       process.env.CRYPTO_SEC
     );
     const Originalpassword = hashPassword.toString(CryptoJS.enc.Utf8);
 
-    console.log(Originalpassword);
-
+    //check password validty
     if (Originalpassword !== req.body.password) {
       res.status(401).json("Wrong Credentials");
       return;
     }
 
+    //create jwt token
     const accessToken = jwt.sign(
       {
         id: user._id,
@@ -54,6 +58,7 @@ router.post("/login", async (req, res) => {
 
     const { password, ...others } = user._doc;
 
+    //send response with user object and jwt token
     res.status(201).json({ ...others, accessToken });
   } catch (err) {
     res.status(500).json(err.message);
